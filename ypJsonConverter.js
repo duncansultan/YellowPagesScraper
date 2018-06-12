@@ -26,8 +26,10 @@ const convert = async (inputFile, outputFile) => {
 	jsonParser.on('data', async (json) => {
 		let json2csvParser = new Json2csvParser({ fields: ['title', 'address'], header: false });
 		let csvData = json2csvParser.parse(json);
-
-		await fs.appendFile(outputFile, `${csvData}\r\n`);
+		
+		if(csvData) {
+			await fs.appendFile(outputFile, `${csvData}\r\n`);
+		}		
 	});
 
 	console.groupEnd();
