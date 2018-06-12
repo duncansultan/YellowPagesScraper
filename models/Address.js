@@ -8,9 +8,7 @@ module.exports = class Address {
 	//ToDo Add error handling ehre
 	constructor(fullName, fullAddress) {
 		this.FullName = fullName;
-		this.FullAddress = {
-			fullAddress
-		};
+		this.FullAddress = fullAddress;
 		this.FirstName = fullAddress && (fullName.split(' ').slice(0, 1).join(' ') || '').trim();
 		this.LastName = fullAddress && (fullName.split(' ').reverse().slice(0, 1).join(' ') || '').trim();
 		this.Address1 = fullAddress && (fullAddress.split(',').slice(0, 1).pop().split('#').slice(0, 1).pop() || fullAddress.split(',').slice(0, -2).pop()).trim();
