@@ -3,28 +3,33 @@
         "es6": true,
         "node": true
     },
-    "extends": "eslint:recommended",
     "parserOptions": {
-        "sourceType": "module",
-        "ecmaVersion": 8
+        "sourceType": "module"
     },
+    "plugins": [
+        "prettier", 
+        "eslint-plugin-prettier",
+        "import"
+    ],
+    "extends": [
+        "eslint:recommended", 
+        "plugin:node/recommended",
+        "plugin:import/errors",
+        "plugin:import/warnings",
+        "airbnb-base",
+        "eslint-config-prettier"
+    ],
     "rules": {
+        "linebreak-style": 0,
+        "global-require": 0,
+        "eslint linebreak-style": [0, "error", "windows"],
         "no-console":0,
-        "indent": [
-            "error",
-            "tab"
-        ],
-        "linebreak-style": [
-            "error",
-            "windows"
-        ],
-        "quotes": [
-            "error",
-            "single"
-        ],
-        "semi": [
-            "error",
-            "always"
-        ]
+        "node/exports-style": ["error", "module.exports"],
+        "node/prefer-global/buffer": ["error", "always"],
+        "node/prefer-global/console": ["error", "always"],
+        "node/prefer-global/process": ["error", "always"],
+        "node/prefer-global/url-search-params": ["error", "always"],
+        "node/prefer-global/url": ["error", "always"],
+        "prettier/prettier": "error"
     }
 }

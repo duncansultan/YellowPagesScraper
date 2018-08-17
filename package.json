@@ -6,19 +6,22 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "engines": {
+    "node": ">=8.11.3"
+  },
+  "author": "Duncan Hill",
   "license": "ISC",
   "devDependencies": {
-    "eslint-config-google": "^0.9.1",
-    "eslint-config-standard": "^11.0.0",
-    "eslint-plugin-import": "^2.12.0",
-    "eslint-plugin-node": "^6.0.1",
-    "eslint-plugin-promise": "^3.8.0",
-    "eslint-plugin-standard": "^3.1.0"
+    "eslint": "5.3.0",
+    "eslint-config-airbnb-base": "13.1.0",
+    "eslint-config-prettier": "^3.0.1",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-prettier": "^2.6.2",
+    "prettier": "^1.14.2"
   },
   "dependencies": {
     "JSONStream": "^1.3.3",
-    "csv": "^3.1.0",
     "csv-parse": "^2.4.1",
     "csv-stringify": "^3.0.0",
     "flatten": "^1.0.2",
