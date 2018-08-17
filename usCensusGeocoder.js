@@ -1,13 +1,14 @@
-const fs = require('mz/fs');
-const path = require('path');
-const stringify = require('csv-stringify');
-const parse = require('csv-parse');
-const transform = require('stream-transform');
-const Address = require('./models/Address');
-const csvExtFilter = require('./utilities/pathExtFilters').csv;
-const geocode = require('./utilities/geocode');
+/* eslint no-restricted-syntax: ["warn", "ForOfStatement"], no-await-in-loop: ["off"], no-plusplus: ["error", { "allowForLoopAfterthoughts": true }] */
+const fs = require("mz/fs");
+const path = require("path");
+const csvStringify = require("csv-stringify");
+const csvParse = require("csv-parse");
+const streamTransform = require("stream-transform");
+const Address = require("./models/Address");
+const csvExtensionFilter = require("./utilities/pathExtFilters").csv;
+const geocode = require("./utilities/geocode");
 
-/** 
+/**
  * @function parseCsvToAddresses - Parse Csv File into Addresses.
  * @param {string} file - File path.
  * @returns {object[]} - Array of Address Objects.
@@ -16,28 +17,38 @@ const geocode = require('./utilities/geocode');
  * @requires mz/fs
  * @requires csv-parse/lib/sync
  */
-const parseCsvToAddresses = (file) => {
-	return new Promise((resolve, reject) => {
-		console.group(`<parseCsvToAddresses> - Start parsing file ${file}`);
+const parseCsvToAddresses = file =>
+  new Promise((resolve, reject) => {
+    console.group(`<parseCsvToAddresses> - Start parsing file ${file}`);
 
-		const data = [];
-		fs.createReadStream(file).pipe(parse({ columns: true })).pipe(transform((record, callback) => {
-			callback(null, new Address(record.Name, record.Address));
-		}, { parallel: 100 }))
-			.on('data', (row) => {
-				data.push(row);
-			})
-			.on('error', e => {
-				console.groupEnd();
-				reject(e);
-			})
-			.on('end', () => {
-				console.info(`<parseCsvToAddresses> - Finished parsing file ${file} to ${data.length} addresses.`);
-				console.groupEnd();
-				resolve(data);
-			});
-	});
-};
+    const data = [];
+    fs.createReadStream(file)
+      .pipe(csvParse({ columns: true }))
+      .pipe(
+        streamTransform(
+          (record, callback) => {
+            callback(null, new Address(record.Name, record.Address));
+          },
+          { parallel: 100 }
+        )
+      )
+      .on("data", row => {
+        data.push(row);
+      })
+      .on("error", e => {
+        console.groupEnd();
+        reject(e);
+      })
+      .on("end", () => {
+        console.info(
+          `<parseCsvToAddresses> - Finished parsing file ${file} to ${
+            data.length
+          } addresses.`
+        );
+        console.groupEnd();
+        resolve(data);
+      });
+  });
 
 /**
  * @function addressFilter - Filter address objects by criteria.
@@ -45,9 +56,10 @@ const parseCsvToAddresses = (file) => {
  * @returns {boolean} - Is filtered.
  * @private
  */
-const addressFilter = (address) => {
-	let isPoBox = address.Address1.includes('PO Box') || address.Address1.includes('P O Box');
-	return !isPoBox;
+const addressFilter = address => {
+  const isPoBox =
+    address.Address1.includes("PO Box") || address.Address1.includes("P O Box");
+  return !isPoBox;
 };
 
 /**
@@ -59,20 +71,22 @@ const addressFilter = (address) => {
  * @requires mz/fs
  * @requires ./utilities/geocode
  */
-const geocodeAddresses = async (addresses) => {
-	console.group(`<geocodeAddresses> - Start Geocoding ${addresses.length} addresses.`);
+const geocodeAddresses = async addresses => {
+  console.group(
+    `<geocodeAddresses> - Start Geocoding ${addresses.length} addresses.`
+  );
 
-	let geocoded = [];
+  const geocoded = [];
 
-	for (const address of addresses.filter(addressFilter)) {
-		await geocode(address);
-		geocoded.push(address);
-		//ToDo: Consider Writing Csv Records here for better performance and fault tolerance.
-	}
+  for (const address of addresses.filter(addressFilter)) {
+    await geocode(address);
+    geocoded.push(address);
+    // ToDo: Consider Writing Csv Records here for better performance and fault tolerance.
+  }
 
-	console.groupEnd();
+  console.groupEnd();
 
-	return geocoded;
+  return geocoded;
 };
 
 /**
@@ -85,26 +99,27 @@ const geocodeAddresses = async (addresses) => {
  * @requires csv-stringify
  */
 const processFile = async (inputFile, outputFile) => {
-	console.group(`<processFile> - Start Processing file ${inputFile}.`);
+  console.group(`<processFile> - Start Processing file ${inputFile}.`);
 
-	let addresses = await parseCsvToAddresses(inputFile);
-	let geocoded = await geocodeAddresses(addresses);
+  const addresses = await parseCsvToAddresses(inputFile);
+  const geocoded = await geocodeAddresses(addresses);
 
-	return new Promise((resolve, reject) => {
-		stringify(geocoded, { header: true }, async (err, output) => {
+  return new Promise((resolve, reject) => {
+    csvStringify(geocoded, { header: true }, async (error, output) => {
+      await fs.appendFile(outputFile, output, err => {
+        if (err) reject(err);
+      });
 
-			await fs.appendFile(outputFile, output, (err) => {
-				if (err) reject(err);
-			});
+      console.info(
+        `<processFile> - Saved ${output.length} characters to ${outputFile}`
+      );
+      console.groupEnd();
 
-			console.info(`<processFile> - Saved ${output.length} characters to ${outputFile}`);
-			console.groupEnd();
+      // ToDo Move file to history
 
-			//ToDo Move file to history
-
-			resolve(output);
-		});
-	});
+      resolve(output);
+    });
+  });
 };
 
 /**
@@ -118,35 +133,35 @@ const processFile = async (inputFile, outputFile) => {
  * @requires ./Utilities/pathExtFilters
  */
 const run = async (inputPath, outputPath) => {
-	const files = (await fs.readdir(inputPath)).filter(csvExtFilter);
+  const files = (await fs.readdir(inputPath)).filter(csvExtensionFilter);
 
-	for (const fileBase of files) {
-		console.log(`<run> - Start Processing file ${fileBase}.`);
+  for (const fileBase of files) {
+    console.log(`<run> - Start Processing file ${fileBase}.`);
 
-		let inputFile = path.format({
-			root: '/ignored',
-			dir: inputPath,
-			base: fileBase
-		});
+    const inputFile = path.format({
+      root: "/ignored",
+      dir: inputPath,
+      base: fileBase
+    });
 
-		let outputBaseName = path.basename(fileBase, path.extname(fileBase));
-		let outputFile = path.format({
-			root: '/ignored',
-			dir: outputPath,
-			name: outputBaseName,
-			ext: '.csv'
-		});
+    const outputBaseName = path.basename(fileBase, path.extname(fileBase));
+    const outputFile = path.format({
+      root: "/ignored",
+      dir: outputPath,
+      name: outputBaseName,
+      ext: ".csv"
+    });
 
-		await processFile(inputFile, outputFile);
+    await processFile(inputFile, outputFile);
 
-		console.log(`<run> - Finished Processing file ${fileBase}.`);
-		console.groupEnd();
-	}
+    console.log(`<run> - Finished Processing file ${fileBase}.`);
+    console.groupEnd();
+  }
 };
 
 (async () => {
-	const inputPath = 'output\\yp_export\\wait';
-	const outputPath = 'output\\geocoded';
+  const inputPath = "output\\yp_export\\wait";
+  const outputPath = "output\\geocoded";
 
-	await run(inputPath, outputPath);
+  await run(inputPath, outputPath);
 })();

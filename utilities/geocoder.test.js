@@ -1,11 +1,14 @@
-const geocode = require('./geocode');
-const Address = require('./models/Address');
+const geocode = require("./geocode");
+const Address = require("../models/Address");
 
-//Arrange
-let address = new Address('Njeri Wainaina', '220 Indian Park DR #APT 904, Murfreesboro, TN 37128');
+// Arrange
+const address = new Address(
+  "Njeri Wainaina",
+  "220 Indian Park DR #APT 904, Murfreesboro, TN 37128"
+);
 
-//Act
-var result = geocode(address);
+// Act
+const result = geocode(address);
 
-//Assert
+// Assert
 result != null;
