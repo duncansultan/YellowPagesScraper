@@ -1,1 +1,21 @@
-CREATE TABLE `Geocodio` ( `Id` , `FullName` , `Address1` , `Address2` , `InputCity` , `InputState` , `InputZip` , `Latitude` , `Longitude` , `AccuracyScore` , `AccuracyType` , `Number` , `Street` , `City` , `State` , `County` , `Zip` , `Country` , `Source` )
+CREATE TABLE 'Geocodio' (
+	'Id',
+	'FullName',
+	'Address1',
+	'Address2',
+	'InputCity',
+	'InputState',
+	'InputZip',
+	'Latitude',
+	'Longitude',
+	'AccuracyScore',
+	'AccuracyType',
+	'Number',
+	'Street',
+	'City',
+	'State',
+	'County',
+	'Zip',
+	'Country',
+	'Source'
+	)

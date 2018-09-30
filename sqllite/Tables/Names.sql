@@ -1,1 +1,5 @@
-CREATE TABLE "Names" ( `Name` TEXT, `County` TEXT, `IsValid` INTEGER )
+CREATE TABLE 'Names' (
+	'Name' TEXT,
+	'County' TEXT,
+	'IsValid' INT
+	)
