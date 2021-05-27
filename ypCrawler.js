@@ -18,12 +18,11 @@ const SearchResults = require("./models/SearchResults");
  * @example https://people.yellowpages.com/whitepages?first=&last=kimani&zip=&state=tx&page=1&site=
  */
 const getUrl = param =>
-  `https://people.yellowpages.com/whitepages?first=${param.first}&last=${
-    param.last
-  }&zip=${param.zip}&state=${param.state}&page=${param.page}&site=${
-    param.site
-  }`;
-
+  `https://people.yellowpages.com/whitepages/?first_name=${
+    param.first
+  }&last_name=${param.last}&zip=${param.zip}&state=${param.state}`;
+//https://people.yellowpages.com/whitepages/?first_name=&last_name=Ramzan&zip=&state=TX
+//https://people.yellowpages.com/whitepages?first=&last=Ramzan&zip=&state=TX&page=1&site=
 /**
  * @function transform - Transform Search Results.
  * @param {string[]} input- Array of Json Search Results.
@@ -61,13 +60,13 @@ const crawl = async param =>
 
     console.group(`<crawl> - Start ${url}`);
 
-    await x(url, ".c-people-result__item", [
+    await x(url, ".phone-result", [
       {
-        title: "div.c-people-result__title > a@html",
-        address: ".c-people-result__address"
+        title: ".fullname@html",
+        address: ".address"
       }
     ])
-      .paginate(".o-pagination__next a@href")
+      // .paginate(".paginator a@href")
       .limit(10)((err, obj) => {
       if (err) {
         console.error(err);
@@ -157,7 +156,7 @@ const run = async (state, zip) => {
 
 (async () => {
   // Use to Change Search Criteria
-  const state = "WY";
-  const zip = "";
+  const state = "TX";
+  const zip = "Dallas";
   await run(state, zip);
 })();
